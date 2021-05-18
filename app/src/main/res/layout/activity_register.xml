@@ -5,7 +5,6 @@
     android:id="@+id/register_pa"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:clipToOutline="true"
     android:background="@drawable/register_pa">
 
     <Button
@@ -15,6 +14,7 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/register_rectangle_7"
         android:fontFamily="@font/jockey_one"
+        android:textColor="#ffffff"
         android:text="Login"
         android:textSize="20dp"
         app:backgroundTint="#00ab66"/>
@@ -106,6 +106,7 @@
         android:fontFamily="@font/jockey_one"
         android:layout_marginLeft="100dp"
         android:layout_marginTop="70dp"
+        android:textColor="#ffffff"
         android:textSize="20dp"
         android:text="Register"/>
 </RelativeLayout>
