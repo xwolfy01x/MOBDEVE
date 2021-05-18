@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sample_home"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/intro_sample_home">
+
+    <TextView
+        android:id="@id/tv1"
+        android:layout_width="171dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="275dp"
+        android:fontFamily="@font/blackhansans_layout"
+        android:gravity="top"
+        android:text="IDLE"
+        android:textAppearance="@style/idle_walk" />
+
+    <TextView
+        android:layout_width="171dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/blackhansans_layout"
+        android:gravity="right|top"
+        android:text="WALK"
+        android:textAppearance="@style/idle_walk"
+        android:textColor="#00ab66" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="201dp"
+        android:layout_height="201dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="103dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/shoe_model"
+        app:civ_border_color="#ffffff"
+        app:civ_border_width="2dp" />
+
+    <ImageView
+        android:layout_width="115dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/tv1"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="204dp"
+        android:background="@drawable/right_colored_shoe" />
+
+    <ImageView
+        android:layout_width="115dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/tv1"
+        android:layout_marginLeft="90dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/left_colored_shoe" />
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="92dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="180dp"
+        android:src="@drawable/footsteps_white" />
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="200dp"
+        android:text="Login"
+        android:fontFamily="@font/jockey_one"
+        android:background="@drawable/intro_rectangle_1"
+        app:backgroundTint="#00ab66"
+        android:textSize="25dp"
+        android:textColor="#ffffff"
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"/>
+
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="92dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="109dp"
+        android:src="@drawable/footsteps_white" />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="100dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="100dp"
+        android:text="Register"
+        android:fontFamily="@font/jockey_one"
+        android:background="@drawable/intro_rectangle_1"
+        app:backgroundTint="#00ab66"
+        android:textSize="25dp"
+        android:textColor="#ffffff"
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"/>
+
+</RelativeLayout>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/register_pa"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clipToOutline="true"
+    android:background="@drawable/register_pa">
+
+    <Button
+        android:layout_width="131dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/register_rectangle_7"
+        android:fontFamily="@font/jockey_one"
+        android:text="Login"
+        android:textSize="20dp"
+        app:backgroundTint="#00ab66"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/footstepstrail" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/jockey_one"
+        android:text="Name"
+        android:textSize="30dp"
+        android:textColor="#ffffff"
+        android:layout_marginTop="100dp"
+        android:layout_marginLeft="50dp"/>
+
+    <EditText
+        android:id="@+id/et_userName"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:fontFamily="@font/jockey_one"
+        android:background="#ffffff"
+        android:layout_below="@+id/tv_userName"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"/>
+
+    <TextView
+        android:id="@+id/tv_userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/jockey_one"
+        android:text="Username"
+        android:textSize="30dp"
+        android:textColor="#ffffff"
+        android:layout_marginTop="200dp"
+        android:layout_marginLeft="50dp"/>
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/jockey_one"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:background="#ffffff"
+        android:layout_below="@+id/tv_name"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"/>
+
+    <TextView
+        android:id="@+id/tv_pass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/jockey_one"
+        android:text="Password"
+        android:textSize="30dp"
+        android:textColor="#ffffff"
+        android:layout_marginTop="300dp"
+        android:layout_marginLeft="50dp"/>
+
+    <EditText
+        android:id="@+id/et_pass"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/jockey_one"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:background="#ffffff"
+        android:layout_below="@+id/tv_pass"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"/>
+    
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        app:backgroundTint="#00ab66"
+        android:background="@drawable/register_rectangle_5"
+        android:layout_below="@+id/et_pass"
+        android:fontFamily="@font/jockey_one"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="70dp"
+        android:textSize="20dp"
+        android:text="Register"/>
+</RelativeLayout>
