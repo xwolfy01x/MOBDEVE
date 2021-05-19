@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                 String pass = et_pass2.getText().toString();
 
                 if(user.equalsIgnoreCase(userList.get(i).getUsername()) && pass.equalsIgnoreCase(userList.get(i).getPassword())) {
-                    Intent intent = new Intent(getApplicationContext(), RunningManAnimation.class);
+                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivity(intent);
                 }
                 //next activity
