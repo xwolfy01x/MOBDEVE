@@ -146,14 +146,14 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
                 android:textSize="20dp" />
-            <Button
+            <ImageView
                 android:id="@+id/btn_cap_upg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
                 app:backgroundTint="#00ab66"
-                android:text="1"
+                android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
 
         </LinearLayout>
@@ -199,14 +199,14 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
                 android:textSize="20dp" />
-            <Button
+            <ImageView
                 android:id="@+id/btn_cloth_upg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
                 app:backgroundTint="#00ab66"
-                android:text="1"
+                android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
 
 
@@ -254,14 +254,14 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
                 android:textSize="20dp" />
-            <Button
+            <ImageView
                 android:id="@+id/btn_shorts_upg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
                 app:backgroundTint="#00ab66"
-                android:text="1"
+                android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
 
         </LinearLayout>
@@ -308,14 +308,14 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
                 android:textSize="20dp" />
-            <Button
+            <ImageView
                 android:id="@+id/btn_shoes_upg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
                 app:backgroundTint="#00ab66"
-                android:text="1"
+                android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
 
         </LinearLayout>
