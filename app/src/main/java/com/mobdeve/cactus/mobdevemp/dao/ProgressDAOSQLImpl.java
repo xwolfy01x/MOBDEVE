@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.mobdeve.cactus.mobdevemp.models.Progress;
+import com.mobdeve.cactus.mobdevemp.models.User;
 
 public class ProgressDAOSQLImpl implements ProgressDAO {
     private SQLiteDatabase database;
@@ -20,9 +21,9 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
     public Progress getOneProgress(String username) {
         Progress oneProgress;
         database = progressDatabase.getReadableDatabase();
-        String QUERY = "SELECT * FROM " + ProgressDatabase.TABLEPROGRESS + " WHERE " + ProgressDatabase.PROGRESS_USER + " = " + username;
+        String QUERY = "SELECT * FROM " + ProgressDatabase.TABLEPROGRESS + " WHERE " + ProgressDatabase.PROGRESS_USER + "= ?";
 
-        Cursor c = database.rawQuery(QUERY, null);
+        Cursor c = database.rawQuery(QUERY, new String[] { username });
 
         if (c != null) {
             c.moveToFirst();
@@ -39,10 +40,6 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
             oneProgress.setShortshard(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_SHORTSHARD)));
             oneProgress.setShoeshard(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_SHOESHARD)));
 
-            oneProgress.setCapVal(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_CAPVAL)));
-            oneProgress.setShirtVal(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_SHIRTVAL)));
-            oneProgress.setShortVal(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_SHORTVAL)));
-            oneProgress.setShoeVal(c.getInt(c.getColumnIndex(ProgressDatabase.PROGRESS_SHOEVAL)));
         } else {
             oneProgress = new Progress(c.getString(c.getColumnIndex(ProgressDatabase.PROGRESS_USER)));
         }
@@ -51,8 +48,7 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
         return oneProgress;
     }
 
-    @Override
-    public void addProgress(Progress oneProgress) {
+    public void initializeProgress(Progress oneProgress) {
         database = progressDatabase.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -70,12 +66,29 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
         values.put(ProgressDatabase.PROGRESS_SHORTSHARD, oneProgress.getShortshard());
         values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
 
-        values.put(ProgressDatabase.PROGRESS_CAPVAL, oneProgress.getCapVal());
-        values.put(ProgressDatabase.PROGRESS_SHIRTVAL, oneProgress.getShirtVal());
-        values.put(ProgressDatabase.PROGRESS_SHORTVAL, oneProgress.getShortVal());
-        values.put(ProgressDatabase.PROGRESS_SHOEVAL, oneProgress.getShoeVal());
 
         long entry = database.insert(ProgressDatabase.TABLEPROGRESS, null, values);
         database.close();
+    }
+
+    public void updateProgress(Progress oneProgress) {
+        database = progressDatabase.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(ProgressDatabase.PROGRESS_USER, oneProgress.getUsername());
+        values.put(ProgressDatabase.PROGRESS_GOLD, oneProgress.getGold());
+
+        values.put(ProgressDatabase.PROGRESS_CAPLVL, oneProgress.getCaplvl());
+        values.put(ProgressDatabase.PROGRESS_SHIRTLVL, oneProgress.getShirtlvl());
+        values.put(ProgressDatabase.PROGRESS_SHORTLVL, oneProgress.getShortlvl());
+        values.put(ProgressDatabase.PROGRESS_SHOELVL, oneProgress.getShoelvl());
+
+        values.put(ProgressDatabase.PROGRESS_CAPSHARD, oneProgress.getCapshard());
+        values.put(ProgressDatabase.PROGRESS_SHIRTSHARD, oneProgress.getShirtshard());
+        values.put(ProgressDatabase.PROGRESS_SHORTSHARD, oneProgress.getShortshard());
+        values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
+
+        long entry = database.update(ProgressDatabase.TABLEPROGRESS, values, ProgressDatabase.PROGRESS_USER + " = ?", new String[] { oneProgress.getUsername() });
     }
 }

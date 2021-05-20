@@ -3,6 +3,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.mobdeve.cactus.mobdevemp.models.User;
 
@@ -50,26 +51,17 @@ public class UserDAOSQLImpl implements UserDAO {
     }
 
     public User getUser(String userName) {
-        User user;
         database = userDatabase.getReadableDatabase();
-        String[] columns = {UserDatabase.USER_NAME, UserDatabase.USER_USERNAME, UserDatabase.USER_PASSWORD, UserDatabase.USER_LEVEL, UserDatabase.USER_CURREXP};
-        Cursor cursor = database.query(
-                UserDatabase.TABLEUSER,
-                columns,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+        String QUERY = "SELECT * FROM " + UserDatabase.TABLEUSER + " WHERE " + UserDatabase.USER_USERNAME + " = ?";
+
+        Cursor cursor = database.rawQuery(QUERY, new String[] { userName });
         int found = 0;
-        while (!cursor.isAfterLast() && found==0) {
+        while (cursor != null) {
+            cursor.moveToFirst();
             User temp = new User(cursor.getString(cursor.getColumnIndex("name")), cursor.getString(cursor.getColumnIndex("username")), cursor.getString(cursor.getColumnIndex("password")));
-            if (temp.getUsername().equalsIgnoreCase(userName)) {
-                temp.setLevel(cursor.getInt(cursor.getColumnIndex("level")));
-                temp.setCurrentExp(cursor.getInt(cursor.getColumnIndex("current_exp")));
-                return temp;
-            } else cursor.moveToNext();
+            temp.setLevel(cursor.getInt(cursor.getColumnIndex("level")));
+            temp.setCurrentExp(cursor.getInt(cursor.getColumnIndex("current_exp")));
+            return temp;
         }
         return null;
     }

@@ -24,11 +24,6 @@ public class ProgressDatabase extends SQLiteOpenHelper {
     public static final String PROGRESS_SHORTSHARD = "shortShard";
     public static final String PROGRESS_SHOESHARD = "shoeShard";
 
-    public static final String PROGRESS_CAPVAL = "capVal";
-    public static final String PROGRESS_SHIRTVAL = "shirtVal";
-    public static final String PROGRESS_SHORTVAL = "shortVal";
-    public static final String PROGRESS_SHOEVAL = "shoeVal";
-
     public static final String CREATE_PROGRESS_TABLE =
             "create table " + TABLEPROGRESS +
                     "("
@@ -43,11 +38,7 @@ public class ProgressDatabase extends SQLiteOpenHelper {
                     + PROGRESS_CAPSHARD + " integer, "
                     + PROGRESS_SHIRTSHARD + " integer, "
                     + PROGRESS_SHORTSHARD + " integer, "
-                    + PROGRESS_SHOESHARD + " integer, "
-                    + PROGRESS_CAPVAL + " double, "
-                    + PROGRESS_SHIRTVAL + " double, "
-                    + PROGRESS_SHORTVAL + " double, "
-                    + PROGRESS_SHOEVAL + " double );";
+                    + PROGRESS_SHOESHARD + " integer) ";
     public ProgressDatabase (Context context) {super(context,DATABASE_NAME, null,DATABASE_VERSION);}
 
     @Override

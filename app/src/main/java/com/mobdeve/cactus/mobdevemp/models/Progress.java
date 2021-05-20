@@ -36,10 +36,6 @@ public class Progress {
         this.shirtshard = 0;
         this.shoeshard = 0;
         this.shortshard = 0;
-        this.capVal = 0.0;
-        this.shirtVal = 0.0;
-        this.shortVal = 0.0;
-        this.shoeVal = 0.0;
     }
 
     public String getUsername() {
@@ -122,35 +118,4 @@ public class Progress {
         this.shoeshard = shoeshard;
     }
 
-    public double getCapVal() {
-        return capVal;
-    }
-
-    public void setCapVal(double capVal) {
-        this.capVal = capVal;
-    }
-
-    public double getShirtVal() {
-        return shirtVal;
-    }
-
-    public void setShirtVal(double shirtVal) {
-        this.shirtVal = shirtVal;
-    }
-
-    public double getShortVal() {
-        return shortVal;
-    }
-
-    public void setShortVal(double shortVal) {
-        this.shortVal = shortVal;
-    }
-
-    public double getShoeVal() {
-        return shoeVal;
-    }
-
-    public void setShoeVal(double shoeVal) {
-        this.shoeVal = shoeVal;
-    }
 }

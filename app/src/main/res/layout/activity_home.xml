@@ -137,7 +137,7 @@
                 android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
-                android:textColor="#ffd700"
+                android:textColor="#ffffff"
                 android:textSize="20dp" />
             <ImageView
                 android:id="@+id/btn_cap_upg"
@@ -184,7 +184,7 @@
                 android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
-                android:textColor="#ffd700"
+                android:textColor="#ffffff"
                 android:textSize="20dp" />
             <ImageView
                 android:id="@+id/btn_cloth_upg"
@@ -231,7 +231,7 @@
                 android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
-                android:textColor="#ffd700"
+                android:textColor="#ffffff"
                 android:textSize="20dp" />
             <ImageView
                 android:id="@+id/btn_shorts_upg"
@@ -279,7 +279,7 @@
                 android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
-                android:textColor="#ffd700"
+                android:textColor="#ffffff"
                 android:textSize="20dp" />
             <ImageView
                 android:id="@+id/btn_shoes_upg"

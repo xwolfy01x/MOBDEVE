@@ -4,5 +4,5 @@ import com.mobdeve.cactus.mobdevemp.models.Progress;
 
 public interface ProgressDAO {
     Progress getOneProgress(String username);
-    void addProgress(Progress oneProgress);
+    void initializeProgress(Progress oneProgress);
 }

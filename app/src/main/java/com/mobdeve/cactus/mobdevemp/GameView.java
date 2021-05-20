@@ -115,16 +115,6 @@ public class GameView extends SurfaceView implements Runnable {
         playing = true;
         gameThread = new Thread(this);
         gameThread.start();
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN :
-                isMoving = !isMoving;
-                break;
-        }
-
-        return true;
+        isMoving = !isMoving;
     }
 }
