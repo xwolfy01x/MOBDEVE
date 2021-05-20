@@ -58,7 +58,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="120dp"
         android:layout_marginTop="88dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -111,7 +111,6 @@
             android:layout_margin="10dp"
             android:background="#192841"
             android:orientation="horizontal"
-            android:weightSum="5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -130,18 +129,12 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="15dp"
-                android:layout_weight="1"
-                android:src="@drawable/gold_coin"/>
             <TextView
-                android:id="@+id/tv_cap_price"
+                android:id="@+id/tv_cap_shard"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="18.87M"
+                android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
@@ -183,18 +176,12 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="15dp"
-                android:layout_weight="1"
-                android:src="@drawable/gold_coin"/>
             <TextView
-                android:id="@+id/tv_cloth_price"
+                android:id="@+id/tv_cloth_shard"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="18.87M"
+                android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
@@ -208,8 +195,6 @@
                 app:backgroundTint="#00ab66"
                 android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
-
-
         </LinearLayout>
 
         <LinearLayout
@@ -238,18 +223,12 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="15dp"
-                android:layout_weight="1"
-                android:src="@drawable/gold_coin"/>
             <TextView
-                android:id="@+id/tv_shorts_price"
+                android:id="@+id/tv_shorts_shard"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="18.87M"
+                android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"
@@ -292,18 +271,12 @@
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="15dp"
-                android:layout_weight="1"
-                android:src="@drawable/gold_coin"/>
             <TextView
-                android:id="@+id/tv_shoes_price"
+                android:id="@+id/tv_shoes_shard"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="18.87M"
+                android:text="32/48"
                 android:gravity="center"
                 android:fontFamily="@font/jockey_one"
                 android:textColor="#ffd700"

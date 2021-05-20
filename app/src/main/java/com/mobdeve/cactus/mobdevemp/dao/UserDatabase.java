@@ -13,6 +13,8 @@ public class UserDatabase extends SQLiteOpenHelper {
     public static final String USER_NAME = "name";
     public static final String USER_USERNAME = "username";
     public static final String USER_PASSWORD = "password";
+    public static final String USER_LEVEL = "level";
+    public static final String USER_CURREXP = "current_exp";
 
     private static final String CREATE_USER_TABLE =
             "create table " + TABLEUSER +
@@ -20,21 +22,22 @@ public class UserDatabase extends SQLiteOpenHelper {
                     + USER_ID + " integer primary key autoincrement, "
                     + USER_NAME + " text, "
                     + USER_USERNAME + " text, "
-                    + USER_PASSWORD + " text ); ";
+                    + USER_PASSWORD + " text, "
+                    + USER_LEVEL + " integer, "
+                    + USER_CURREXP + " integer ); ";
 
-    public UserDatabase(Context context){
+    public UserDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db){
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USER_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(" DROP TABLE IF EXISTS " + TABLEUSER);
         onCreate(db);
     }
-
 }

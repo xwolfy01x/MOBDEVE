@@ -26,8 +26,8 @@ public class GameView extends SurfaceView implements Runnable {
     private Canvas canvas;
     private Bitmap bitmapRunningMan, bitmapBackground;
     private boolean isMoving;
-    private float runSpeedPerSecond = 50;
-    private float manXPos = 0, manYPos = 200;
+    private float runSpeedPerSecond = 10;
+    private float manXPos = 0, manYPos = 50;
     private int frameWidth = 150, frameHeight = 150;
     private int frameCount = 6;
     private int currentFrame = 0;
