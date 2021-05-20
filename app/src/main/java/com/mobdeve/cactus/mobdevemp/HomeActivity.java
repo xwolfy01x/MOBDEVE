@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -40,6 +41,9 @@ public class HomeActivity extends AppCompatActivity {
     User user;
     Progress userProgress;
     Timer timer;
+    double capRate, shirtRate;
+    long resumeTime;
+    long pauseTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +54,16 @@ public class HomeActivity extends AppCompatActivity {
         progressDB = new ProgressDAOSQLImpl(getApplicationContext());
         sp = getSharedPreferences("user", Context.MODE_PRIVATE);
 
-        init();
-
         //get data from the db
         user = userDB.getUser(sp.getString("username", ""));
         userProgress = progressDB.getOneProgress(user.getUsername());
 
+        init();
+
         //set the data of the wintermelon
         tv_name3.setText(user.getName());
+        resumeTime = System.currentTimeMillis();
+        pauseTime = System.currentTimeMillis();
     }
     public void init() {
         //Initialize the chubacabra
@@ -81,16 +87,18 @@ public class HomeActivity extends AppCompatActivity {
         gameView = new GameView(this);
         cl = (ConstraintLayout) findViewById(R.id.cl);
         cl.addView(gameView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
+        capRate = capFormula(userProgress.getCaplvl());
+        shirtRate = shirtFormula(userProgress.getShirtlvl());
 
         cl.setOnClickListener(v -> {
             Double currentGold = Double.parseDouble(tv_gold.getText().toString());
             Double capBonusGold = 5.0;
             if (userProgress.getCaplvl() > 0)
-                capBonusGold = 5 + Math.pow(1.25, userProgress.getCaplvl());
+                capBonusGold = capRate;
             tv_gold.setText(Double.toString(currentGold + capBonusGold));
         });
 
-        tv_gold.setText("0");
+        tv_gold.setText(String.format("%.2f",userProgress.getGold()));
 
         btn_cap_upg.setOnClickListener(v -> {
             userProgress.setCaplvl(userProgress.getCaplvl()+1);
@@ -143,7 +151,7 @@ public class HomeActivity extends AppCompatActivity {
             refreshData();
         } else {
             tv_cloth_shard.setTextColor(Color.WHITE);
-            btn_cloth_upg.setEnabled(false);
+//            btn_cloth_upg.setEnabled(false);
         }
         if (userProgress.getShortshard() > (10+userProgress.getShortlvl()*5)) {
             tv_shorts_shard.setTextColor(Color.YELLOW);
@@ -172,15 +180,31 @@ public class HomeActivity extends AppCompatActivity {
             public void run() {
                 Double currentGold = Double.parseDouble(tv_gold.getText().toString());
                 if (userProgress.getShirtlvl() != 0) {
-                    Double shirtBonusGold = Math.pow(1.5, userProgress.getShirtlvl());
+                    Double shirtBonusGold = capRate;
                     tv_gold.setText(String.format("%.2f",currentGold + shirtBonusGold));
                 }
             }
         }, 0, 1000);
     }
 
+    public double capFormula(int level) {
+        double baseCoin = 5.0;
+        for (int i = 1; i < level; i++)
+            baseCoin += baseCoin * 0.05;
+        return baseCoin;
+    }
+
+    public double shirtFormula(int level) {
+        double baseCoin = 1.5;
+        for (int i = 1; i < level; i++)
+            baseCoin += baseCoin * 0.5;
+        return baseCoin;
+    }
+
     public void saveData() {
         progressDB.updateProgress(userProgress);
+        capRate = capFormula(userProgress.getCaplvl());
+        shirtRate = shirtFormula(userProgress.getShirtlvl());
     }
 
     @Override
@@ -189,6 +213,14 @@ public class HomeActivity extends AppCompatActivity {
         gameView.resume();
         refreshData();
         refreshGold();
+        resumeTime = System.currentTimeMillis();
+        if (resumeTime > pauseTime) {
+            Double currentGold = userProgress.getGold();
+            long diffInSeconds = (resumeTime - pauseTime)/1000;
+            Toast.makeText(this, Long.toString(diffInSeconds), Toast.LENGTH_SHORT).show();
+            double value = currentGold + shirtFormula(userProgress.getShirtlvl()) * diffInSeconds;
+            tv_gold.setText(String.format("%.2f", value));
+        }
     }
 
     @Override
@@ -196,5 +228,16 @@ public class HomeActivity extends AppCompatActivity {
         super.onPause();
         gameView.pause();
         timer.cancel();
+        userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
+        saveData();
+        pauseTime = System.currentTimeMillis();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
+        saveData();
+        super.onDestroy();
     }
 }
