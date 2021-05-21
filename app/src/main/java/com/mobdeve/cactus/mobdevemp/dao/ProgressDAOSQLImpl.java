@@ -90,5 +90,6 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
         values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
 
         long entry = database.update(ProgressDatabase.TABLEPROGRESS, values, ProgressDatabase.PROGRESS_USER + " = ?", new String[] { oneProgress.getUsername() });
+        database.close();
     }
 }

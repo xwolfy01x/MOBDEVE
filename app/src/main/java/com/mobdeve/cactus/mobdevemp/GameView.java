@@ -103,7 +103,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void pause() {
         playing = false;
-
+        isMoving = !isMoving;
         try {
             gameThread.join();
         } catch(InterruptedException e) {

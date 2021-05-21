@@ -16,7 +16,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.level = 1;
-        this.currentExp = 10;
+        this.currentExp = 0;
     }
 
     public void setName(String name) {

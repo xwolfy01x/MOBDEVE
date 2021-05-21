@@ -80,4 +80,15 @@ public class UserDAOSQLImpl implements UserDAO {
         long entry = database.insert(UserDatabase.TABLEUSER, null, values);
         database.close();
     }
+
+    public void updateUser(User existingUser) {
+        database = userDatabase.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(UserDatabase.USER_LEVEL, existingUser.getLevel());
+        values.put(UserDatabase.USER_CURREXP, existingUser.getCurrentExp());
+
+        long entry = database.update(UserDatabase.TABLEUSER, values, UserDatabase.USER_USERNAME + " = ?", new String[] {existingUser.getUsername()});
+        database.close();
+    }
 }
