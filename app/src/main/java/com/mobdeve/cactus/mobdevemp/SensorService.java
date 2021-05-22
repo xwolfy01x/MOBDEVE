@@ -1,6 +1,10 @@
 package com.mobdeve.cactus.mobdevemp;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -8,8 +12,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.os.SystemClock;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 public class SensorService extends Service implements SensorEventListener {
     private static final String DEBUG_TAG = "MotionLoggerService";
@@ -60,6 +66,37 @@ public class SensorService extends Service implements SensorEventListener {
             }
             return null;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        scheduleNotification(this, 1000, 100);
+    }
+    public void scheduleNotification(Context context, long delay, int notificationId) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.footsteps_white)
+                .setContentTitle("Idle Walk")
+                .setContentText("You've reached your idle time! Come back soon!")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("You've reached your idle time! Come back soon!"))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("NotificationText", "You've reached your idle time! Come back soon!");
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        builder.setContentIntent(pendingIntent);
+
+        Notification notification = builder.build();
+
+        Intent notificationIntent = new Intent(context, AlarmReceiver.class);
+        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationId);
+        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
+        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent2);
     }
 }
 

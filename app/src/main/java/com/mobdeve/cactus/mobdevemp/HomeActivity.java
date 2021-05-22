@@ -1,6 +1,9 @@
 package com.mobdeve.cactus.mobdevemp;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +15,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
@@ -23,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.mobdeve.cactus.mobdevemp.dao.ProgressDAOSQLImpl;
@@ -50,7 +55,8 @@ public class HomeActivity extends AppCompatActivity {
     User user;
     Progress userProgress;
     Timer timer;
-    double capRate, shirtRate, shortRate;
+    double capGoldRate, capExpRate, shirtRate, shortExpRate, shortGoldRate;
+    Long shoesCapRate;
     long resumeTime;
     long pauseTime;
 
@@ -74,41 +80,6 @@ public class HomeActivity extends AppCompatActivity {
         resumeTime = System.currentTimeMillis();
         pauseTime = System.currentTimeMillis();
 
-//        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-//        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//        SensorEventListener stepDetector = new SensorEventListener() {
-//            @Override
-//            public void onSensorChanged(SensorEvent sensorEvent) {
-//                if (sensorEvent!=null) {
-//                    float x_acceleration = sensorEvent.values[0];
-//                    float y_acceleration = sensorEvent.values[1];
-//                    float z_acceleration = sensorEvent.values[2];
-//                    double Magnitude = Math.sqrt(x_acceleration*x_acceleration + y_acceleration*y_acceleration + z_acceleration*z_acceleration);
-//                    double MagnitudeDelta = Magnitude - MagnitudePrevious;
-//                    MagnitudePrevious = Magnitude;
-//
-//                    if (MagnitudeDelta > 3) {
-//                        stepCount++;
-//                        if (progressBar.getProgress() + (int) shortRate > progressBar.getMax()) {
-//                            user.setCurrentExp(progressBar.getProgress() + (int) shortRate - progressBar.getMax());
-//                            progressBar.setProgress(progressBar.getProgress() + (int) shortRate - progressBar.getMax());
-//                            user.setLevel(user.getLevel()+1);
-//                            progressBar.setMax((int) getProgressMax(user.getLevel()));
-//                            refreshData();
-//                        } else {
-//                            progressBar.setProgress(user.getCurrentExp() + (int) shortRate);
-//                            user.setCurrentExp(user.getCurrentExp() + (int) shortRate);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-//
-//            }
-//        };
-//        sensorManager.registerListener(stepDetector, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
     public void init() {
         //Initialize the chubacabra
@@ -132,15 +103,27 @@ public class HomeActivity extends AppCompatActivity {
         gameView = new GameView(this);
         cl = (ConstraintLayout) findViewById(R.id.cl);
         cl.addView(gameView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
-        capRate = capFormula(userProgress.getCaplvl());
+        capExpRate = capExpFormula(userProgress.getCaplvl());
+        capGoldRate = capGoldFormula(userProgress.getCaplvl());
         shirtRate = shirtFormula(userProgress.getShirtlvl());
-        shortRate = shortsFormula(userProgress.getShortlvl());
+        shortGoldRate = shortsGoldFormula(userProgress.getShortlvl());
+        shortExpRate = shortsExpFormula(userProgress.getShortlvl());
 
         cl.setOnClickListener(v -> {
             Double currentGold = Double.parseDouble(tv_gold.getText().toString());
             Double capBonusGold = 5.0;
             if (userProgress.getCaplvl() > 0)
-                capBonusGold = capRate;
+                capBonusGold = capGoldRate;
+            if (progressBar.getProgress() + (int) capExpRate > progressBar.getMax()) {
+                user.setCurrentExp(progressBar.getProgress() + (int) capExpRate - progressBar.getMax());
+                progressBar.setProgress(progressBar.getProgress() + (int) capExpRate - progressBar.getMax());
+                user.setLevel(user.getLevel()+1);
+                progressBar.setMax((int) getProgressMax(user.getLevel()));
+                refreshData();
+            } else {
+                progressBar.setProgress(user.getCurrentExp() + (int) capExpRate);
+                user.setCurrentExp(user.getCurrentExp() + (int) capExpRate);
+            }
             tv_gold.setText(Double.toString(currentGold + capBonusGold));
         });
 
@@ -148,7 +131,8 @@ public class HomeActivity extends AppCompatActivity {
 
         btn_cap_upg.setOnClickListener(v -> {
             userProgress.setCaplvl(userProgress.getCaplvl()+1);
-            capRate = capFormula(userProgress.getCaplvl());
+            capExpRate = capExpFormula(userProgress.getCaplvl());
+            capGoldRate = capGoldFormula(userProgress.getCaplvl());
             refreshData();
         });
 
@@ -160,12 +144,14 @@ public class HomeActivity extends AppCompatActivity {
 
         btn_shorts_upg.setOnClickListener(v -> {
             userProgress.setShortlvl(userProgress.getShortlvl()+1);
-            shortRate = shortsFormula(userProgress.getShortlvl());
+            shortGoldRate = shortsGoldFormula(userProgress.getShortlvl());
+            shortExpRate = shortsExpFormula(userProgress.getShortlvl());
             refreshData();
         });
 
         btn_shoes_upg.setOnClickListener(v -> {
             userProgress.setShoelvl(userProgress.getShoelvl()+1);
+            shoesCapRate = shoesCapFormula((userProgress.getShoelvl()));
             refreshData();
         });
 
@@ -178,15 +164,18 @@ public class HomeActivity extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (progressBar.getProgress() + (int) shortRate > progressBar.getMax()) {
-                user.setCurrentExp(progressBar.getProgress() + (int) shortRate - progressBar.getMax());
-                progressBar.setProgress(progressBar.getProgress() + (int) shortRate - progressBar.getMax());
-                user.setLevel(user.getLevel()+1);
-                progressBar.setMax((int) getProgressMax(user.getLevel()));
-                refreshData();
-            } else {
-                progressBar.setProgress(user.getCurrentExp() + (int) shortRate);
-                user.setCurrentExp(user.getCurrentExp() + (int) shortRate);
+            if (userProgress.getShortlvl() > 0) {
+                tv_gold.setText(String.format("%.2f", Double.parseDouble(tv_gold.getText().toString()) + shortGoldRate));
+                if (progressBar.getProgress() + (int) shortExpRate > progressBar.getMax()) {
+                    user.setCurrentExp(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
+                    progressBar.setProgress(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
+                    user.setLevel(user.getLevel()+1);
+                    progressBar.setMax((int) getProgressMax(user.getLevel()));
+                    refreshData();
+                } else {
+                    progressBar.setProgress(user.getCurrentExp() + (int) shortExpRate);
+                    user.setCurrentExp(user.getCurrentExp() + (int) shortExpRate);
+                }
             }
         }
     };
@@ -238,12 +227,12 @@ public class HomeActivity extends AppCompatActivity {
             refreshData();
         } else {
             tv_shoes_shard.setTextColor(Color.WHITE);
-            btn_shoes_upg.setEnabled(false);
+//            btn_shoes_upg.setEnabled(false);
         }
     }
 
     public void refreshGold() {
-            shirtRate=shirtFormula(userProgress.getShirtlvl());
+        shirtRate=shirtFormula(userProgress.getShirtlvl());
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -261,7 +250,14 @@ public class HomeActivity extends AppCompatActivity {
         timer.cancel();
     }
 
-    public double capFormula(int level) {
+    public double capExpFormula(int level) {
+        double baseExp = 1;
+        for (int i = 1; i < level; i++)
+            baseExp += baseExp * 0.05;
+        return baseExp;
+    }
+
+    public double capGoldFormula(int level) {
         double baseCoin = 5.0;
         for (int i = 1; i < level; i++)
             baseCoin += baseCoin * 0.05;
@@ -275,11 +271,22 @@ public class HomeActivity extends AppCompatActivity {
         return baseCoin;
     }
 
-    public double shortsFormula(int level) {
+    public double shortsExpFormula(int level) {
         double baseExp = 2.0;
         for (int i = 1; i < level; i++)
             baseExp += baseExp * 0.5;
         return baseExp;
+    }
+    public double shortsGoldFormula(int level) {
+        double baseGold = 10.0;
+        for (int i = 1; i < level; i++)
+            baseGold += baseGold * 0.5;
+        return baseGold;
+    }
+
+    public Long shoesCapFormula(int level) {
+        Long l = Long.valueOf(level);
+        return l*1000;
     }
 
     public double getProgressMax(int level) {
@@ -328,6 +335,8 @@ public class HomeActivity extends AppCompatActivity {
     protected void onDestroy() {
         userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
         saveData();
+        timer.cancel();
+        Log.d("USer", Integer.toString(userProgress.getShoelvl()));
         super.onDestroy();
     }
 

@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/bg1"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -29,6 +29,8 @@
             android:icon="@android:color/holo_orange_light"
             android:label="S11:DeliveryService"
             android:process=":sensor_service" />
+        <receiver android:name=".AlarmReceiver"
+            android:enabled="true"/>
     </application>
 
 </manifest>

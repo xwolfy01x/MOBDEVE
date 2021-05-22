@@ -20,7 +20,7 @@ public class StatisticsActivity extends AppCompatActivity {
     }
 
     private void init(){
-        btn_toBack = (ImageView) findViewById(R.id.to_back1);
+//        btn_toBack = (ImageView) findViewById(R.id.to_back1);
 
         btn_toBack.setOnClickListener(v -> {
             Intent i = new Intent(getApplicationContext(),HomeActivity.class);
