@@ -1,41 +1,24 @@
 package com.mobdeve.cactus.mobdevemp;
 
-import android.Manifest;
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.util.Log;
-import android.view.SurfaceView;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import com.mobdeve.cactus.mobdevemp.dao.ProgressDAOSQLImpl;
 import com.mobdeve.cactus.mobdevemp.dao.UserDAOSQLImpl;
 import com.mobdeve.cactus.mobdevemp.models.Progress;
 import com.mobdeve.cactus.mobdevemp.models.User;
-
-import org.w3c.dom.Text;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -165,6 +148,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (userProgress.getShortlvl() > 0) {
+                userProgress.setGold(userProgress.getGold() + shortGoldRate);
                 tv_gold.setText(String.format("%.2f", Double.parseDouble(tv_gold.getText().toString()) + shortGoldRate));
                 if (progressBar.getProgress() + (int) shortExpRate > progressBar.getMax()) {
                     user.setCurrentExp(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
@@ -311,7 +295,6 @@ public class HomeActivity extends AppCompatActivity {
         if (resumeTime > pauseTime) {
             Double currentGold = userProgress.getGold();
             long diffInSeconds = (resumeTime - pauseTime)/1000;
-            Toast.makeText(this, Long.toString(diffInSeconds), Toast.LENGTH_SHORT).show();
             if (userProgress.getShirtlvl()!=0) {
                 double value = currentGold + shirtFormula(userProgress.getShirtlvl()) * diffInSeconds;
                 tv_gold.setText(String.format("%.2f", value));
@@ -336,7 +319,6 @@ public class HomeActivity extends AppCompatActivity {
         userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
         saveData();
         timer.cancel();
-        Log.d("USer", Integer.toString(userProgress.getShoelvl()));
         super.onDestroy();
     }
 

@@ -1,6 +1,8 @@
 package com.mobdeve.cactus.mobdevemp.models;
 
-public class Progress {
+import java.io.Serializable;
+
+public class Progress implements Serializable {
     //basic currency
     private String username;
     private double gold;

@@ -6,29 +6,37 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import com.mobdeve.cactus.mobdevemp.dao.ProgressDAOSQLImpl;
+import com.mobdeve.cactus.mobdevemp.models.Progress;
 
 public class SensorService extends Service implements SensorEventListener {
     private static final String DEBUG_TAG = "MotionLoggerService";
     private SensorManager sensorManager = null;
     private Sensor sensor = null;
     private double MagnitudePrevious;
+    private int notifid = 1;
+    ProgressDAOSQLImpl progressDatabase;
+    private Progress userProgress;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
         return START_STICKY;
     }
 
@@ -70,33 +78,27 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
+        progressDatabase = new ProgressDAOSQLImpl(this);
+        SharedPreferences sp = getSharedPreferences("user", Context.MODE_PRIVATE);
+
+        userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
+
+        if(userProgress.getShoelvl()!=0)
+            scheduleNotification(this, userProgress.getShoelvl()*60000, notifid);
+        notifid++;
         super.onDestroy();
-        scheduleNotification(this, 1000, 100);
+
     }
     public void scheduleNotification(Context context, long delay, int notificationId) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.footsteps_white)
-                .setContentTitle("Idle Walk")
-                .setContentText("You've reached your idle time! Come back soon!")
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("You've reached your idle time! Come back soon!"))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("NotificationText", "You've reached your idle time! Come back soon!");
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        builder.setContentIntent(pendingIntent);
-
-        Notification notification = builder.build();
-
-        Intent notificationIntent = new Intent(context, AlarmReceiver.class);
-        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, notificationId);
-        notificationIntent.putExtra(AlarmReceiver.NOTIFICATION, notification);
-        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        intent.putExtra("notifid", notificationId);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent2);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
     }
 }
 
