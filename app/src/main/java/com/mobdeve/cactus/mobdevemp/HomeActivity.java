@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tv_cap_lvl, tv_cloth_lvl, tv_shorts_lvl, tv_shoes_lvl;
     private TextView tv_cap_shard, tv_cloth_shard, tv_shorts_shard, tv_shoes_shard;
     private ImageView btn_cap_upg, btn_cloth_upg, btn_shorts_upg, btn_shoes_upg;
+    private ImageView btn_market;
     private ProgressBar progressBar;
     private GameView gameView;
     private ViewGroup.LayoutParams lp;
@@ -82,6 +85,7 @@ public class HomeActivity extends AppCompatActivity {
         btn_shorts_upg = (ImageView) findViewById(R.id.btn_shorts_upg);
         btn_shoes_upg = (ImageView) findViewById(R.id.btn_shoes_upg);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        btn_market = (ImageView) findViewById(R.id.btn_market);
 
         gameView = new GameView(this);
         cl = (ConstraintLayout) findViewById(R.id.cl);
@@ -136,6 +140,11 @@ public class HomeActivity extends AppCompatActivity {
             userProgress.setShoelvl(userProgress.getShoelvl()+1);
             shoesCapRate = shoesCapFormula((userProgress.getShoelvl()));
             refreshData();
+        });
+
+        btn_market.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MarketActivity.class);
+            startActivity(intent);
         });
 
         IntentFilter intentFilter = new IntentFilter();
