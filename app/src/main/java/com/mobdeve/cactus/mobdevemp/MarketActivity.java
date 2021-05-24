@@ -47,7 +47,8 @@ public class MarketActivity extends AppCompatActivity {
         tv_gold2 = (TextView) findViewById(R.id.tv_gold2);
         tv_x1 = (TextView) findViewById(R.id.tv_x1);
         tv_x10 = (TextView) findViewById(R.id.tv_x10);
-        tv_x50 = (TextView) findViewById(R.id.tv_x100);
+        tv_x50 = (TextView) findViewById(R.id.tv_x50);
+        tv_x100 = (TextView) findViewById(R.id.tv_x100);
         tv_xn = (TextView) findViewById(R.id.tv_xn);
         cl1 = (ConstraintLayout) findViewById(R.id.cl1);
         cl2 = (ConstraintLayout) findViewById(R.id.cl2);

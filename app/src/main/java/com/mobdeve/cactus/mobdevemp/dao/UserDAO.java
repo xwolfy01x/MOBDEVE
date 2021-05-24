@@ -4,7 +4,7 @@ import com.mobdeve.cactus.mobdevemp.models.User;
 
 import java.util.ArrayList;
 
-public interface UserDAO {
+public interface UserDAO  {
     ArrayList<User> getUsers();
     void addUser(User newUser);
 }

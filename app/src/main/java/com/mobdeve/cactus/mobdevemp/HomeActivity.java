@@ -1,5 +1,6 @@
 package com.mobdeve.cactus.mobdevemp;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +8,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.mobdeve.cactus.mobdevemp.dao.ProgressDAOSQLImpl;
 import com.mobdeve.cactus.mobdevemp.dao.UserDAOSQLImpl;
@@ -326,12 +330,22 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
+        user.setLevel(user.getLevel());
+        user.setCurrentExp(progressBar.getProgress());
         saveData();
         timer.cancel();
+        Intent intent = new Intent();
+        intent.putExtra("gold", userProgress.getGold());
+        intent.putExtra("rate", shortsGoldFormula(userProgress.getShortlvl()));
+        intent.setAction("com.mobdeve.cactus.mobdevemp.service");
+        sendBroadcast(intent);
         super.onDestroy();
     }
 
     private void registerService() {
-        startService(new Intent(this, SensorService.class));
+        Intent serviceIntent = new Intent(this, SensorService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else startService(serviceIntent);
     }
 }

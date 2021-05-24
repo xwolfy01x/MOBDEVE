@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import com.mobdeve.cactus.mobdevemp.models.Progress;
 import com.mobdeve.cactus.mobdevemp.models.User;
 
-public class ProgressDAOSQLImpl implements ProgressDAO {
+import java.io.Serializable;
+
+public class ProgressDAOSQLImpl implements ProgressDAO, Serializable {
     private SQLiteDatabase database;
     private ProgressDatabase progressDatabase;
 
@@ -43,7 +45,7 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
         } else {
             oneProgress = new Progress(c.getString(c.getColumnIndex(ProgressDatabase.PROGRESS_USER)));
         }
-
+        c.close();
         database.close();
         return oneProgress;
     }
@@ -65,7 +67,6 @@ public class ProgressDAOSQLImpl implements ProgressDAO {
         values.put(ProgressDatabase.PROGRESS_SHIRTSHARD, oneProgress.getShirtshard());
         values.put(ProgressDatabase.PROGRESS_SHORTSHARD, oneProgress.getShortshard());
         values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
-
 
         long entry = database.insert(ProgressDatabase.TABLEPROGRESS, null, values);
         database.close();

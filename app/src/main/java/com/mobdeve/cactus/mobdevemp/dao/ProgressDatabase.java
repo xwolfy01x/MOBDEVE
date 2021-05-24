@@ -4,7 +4,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class ProgressDatabase extends SQLiteOpenHelper {
+import java.io.Serializable;
+
+public class ProgressDatabase extends SQLiteOpenHelper implements Serializable {
     private static final String DATABASE_NAME = "progress.db";
     private static final int DATABASE_VERSION = 1;
 

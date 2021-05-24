@@ -3,13 +3,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.mobdeve.cactus.mobdevemp.models.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class UserDAOSQLImpl implements UserDAO {
+public class UserDAOSQLImpl implements UserDAO, Serializable {
 
     private SQLiteDatabase database;
     private UserDatabase userDatabase;
@@ -55,7 +55,7 @@ public class UserDAOSQLImpl implements UserDAO {
         String QUERY = "SELECT * FROM " + UserDatabase.TABLEUSER + " WHERE " + UserDatabase.USER_USERNAME + " = ?";
 
         Cursor cursor = database.rawQuery(QUERY, new String[] { userName });
-        int found = 0;
+        User user = null;
         while (cursor != null) {
             cursor.moveToFirst();
             User temp = new User(cursor.getString(cursor.getColumnIndex("name")), cursor.getString(cursor.getColumnIndex("username")), cursor.getString(cursor.getColumnIndex("password")));
@@ -63,7 +63,9 @@ public class UserDAOSQLImpl implements UserDAO {
             temp.setCurrentExp(cursor.getInt(cursor.getColumnIndex("current_exp")));
             return temp;
         }
-        return null;
+        cursor.close();
+        database.close();
+        return user;
     }
 
     public void addUser(User newUser) {

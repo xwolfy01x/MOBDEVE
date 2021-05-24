@@ -2,10 +2,14 @@ package com.mobdeve.cactus.mobdevemp;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -21,22 +25,87 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.mobdeve.cactus.mobdevemp.dao.ProgressDAOSQLImpl;
+import com.mobdeve.cactus.mobdevemp.dao.UserDAOSQLImpl;
 import com.mobdeve.cactus.mobdevemp.models.Progress;
+import com.mobdeve.cactus.mobdevemp.models.User;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SensorService extends Service implements SensorEventListener {
-    private static final String DEBUG_TAG = "MotionLoggerService";
+    private static final String CHANNEL_ID = "com.mobdeve.cactus.mobdevemp";
     private SensorManager sensorManager = null;
     private Sensor sensor = null;
     private double MagnitudePrevious;
     private int notifid = 1;
+    double gold = 0;
+    double rate = 0;
+    SharedPreferences sp;
     ProgressDAOSQLImpl progressDatabase;
     private Progress userProgress;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        sp = getSharedPreferences("user", Context.MODE_PRIVATE);
+        Intent notificationIntent = new Intent(this, HomeActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        final Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle("Idle Walk Background Running")
+                .setContentText("Idle Walk is tracking steps until cap is reached!")
+                .setSmallIcon(R.drawable.footsteps_white)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setChannelId(CHANNEL_ID)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel notificationChannel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationChannel = new NotificationChannel(CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        startForeground(5, notification);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.mobdeve.cactus.mobdevemp.service");
+
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Timer timer = new Timer();
+            gold = intent.getDoubleExtra("gold", 0);
+            rate = intent.getDoubleExtra("rate", 0);
+            progressDatabase = new ProgressDAOSQLImpl(getApplicationContext());
+            userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm.cancel(5);
+                    userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
+                    userProgress.setGold(gold);
+                    progressDatabase.updateProgress(userProgress);
+                    stopSelf();
+                }
+            }, userProgress.getShortlvl() * 60000);
+
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         return START_STICKY;
     }
 
@@ -55,6 +124,7 @@ public class SensorService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         new SensorEventTask().execute(sensorEvent);
     }
+
     class SensorEventTask extends AsyncTask<SensorEvent, Void, Void> {
         @Override
         protected Void doInBackground(SensorEvent... sensorEvents) {
@@ -70,6 +140,7 @@ public class SensorService extends Service implements SensorEventListener {
                     Intent intent = new Intent();
                     intent.setAction("com.mobdeve.cactus.mobdevemp");
                     sendBroadcast(intent);
+                    gold += rate;
                 }
             }
             return null;
@@ -78,14 +149,9 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-        progressDatabase = new ProgressDAOSQLImpl(this);
-        SharedPreferences sp = getSharedPreferences("user", Context.MODE_PRIVATE);
-
         userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
-
-        if(userProgress.getShoelvl()!=0)
-            scheduleNotification(this, userProgress.getShoelvl()*60000, notifid);
-        notifid++;
+        unregisterReceiver(broadcastReceiver);
+        scheduleNotification(this, 1000, notifid);
         super.onDestroy();
 
     }
