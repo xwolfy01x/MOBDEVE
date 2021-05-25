@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.mobdeve.cactus.mobdevemp.models.Progress;
 import com.mobdeve.cactus.mobdevemp.models.User;
@@ -91,6 +92,7 @@ public class ProgressDAOSQLImpl implements ProgressDAO, Serializable {
         values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
 
         long entry = database.update(ProgressDatabase.TABLEPROGRESS, values, ProgressDatabase.PROGRESS_USER + " = ?", new String[] { oneProgress.getUsername() });
+        Log.d("UPDATE", "NAGUPDATE AKO GAGO");
         database.close();
     }
 }

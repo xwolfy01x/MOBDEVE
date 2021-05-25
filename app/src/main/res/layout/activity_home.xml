@@ -43,11 +43,12 @@
 
     <TextView
         android:id="@+id/tv_name3"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
+        android:layout_width="122dp"
+        android:layout_height="47dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="76dp"
         android:fontFamily="@font/jockey_one"
-        android:gravity="right"
+        android:gravity="left"
         android:paddingRight="30dp"
         android:text="Jeonard"
         android:textColor="#ffffff"
@@ -55,11 +56,71 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/btn_logout"
+        android:layout_width="44dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="34dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/home_rectangle_2"
+        android:src="@drawable/logout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btn_faq"
+        android:layout_width="54dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="144dp"
+        android:background="@drawable/home_rectangle_2"
+        android:padding="5dp"
+        android:src="@drawable/faq"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/btn_stats"
+        android:layout_width="54dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="88dp"
+        android:background="@drawable/home_rectangle_2"
+        android:src="@drawable/stats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="6dp"/>
+
+    <ImageView
+        android:id="@+id/btn_market"
+        android:layout_width="54dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="88dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/home_rectangle_2"
+        android:backgroundTint="#00ab66"
+        android:src="@drawable/market"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="5dp"/>
+
+    <ImageView
+        android:id="@+id/btn_task"
+        android:layout_width="54dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="144dp"
+        android:layout_marginEnd="16dp"
+
+        android:background="@drawable/home_rectangle_2"
+        android:src="@drawable/tasks"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -294,39 +355,7 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/btn_market"
-        android:background="@drawable/home_rectangle_2"
-        android:src="@drawable/market"
-        android:backgroundTint="#00ab66"
-        android:layout_width="130dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
 
-    <ImageView
-        android:id="@+id/btn_wardrobe"
-        android:background="@drawable/home_rectangle_2"
-        android:src="@drawable/wardrobe"
-        android:layout_width="135dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="140dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <ImageView
-        android:id="@+id/btn_task"
-        android:background="@drawable/home_rectangle_2"
-        android:src="@drawable/tasks"
-        android:layout_width="130dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="280dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

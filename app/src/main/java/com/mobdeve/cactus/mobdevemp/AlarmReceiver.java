@@ -38,6 +38,5 @@ public class AlarmReceiver extends BroadcastReceiver{
             notificationManager.createNotificationChannel(notificationChannel);
         }
         notificationManager.notify(notificationId, notification);
-        Log.d("Hi", "I went here");
     }
 }

@@ -30,7 +30,7 @@ public class Progress implements Serializable {
     public Progress(String username) {
         this.username = username;
         this.gold = 0.0;
-        this.caplvl = 0;
+        this.caplvl = 1;
         this.shirtlvl = 0;
         this.shortlvl = 0;
         this.shoelvl = 0;

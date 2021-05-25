@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -34,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tv_cap_lvl, tv_cloth_lvl, tv_shorts_lvl, tv_shoes_lvl;
     private TextView tv_cap_shard, tv_cloth_shard, tv_shorts_shard, tv_shoes_shard;
     private ImageView btn_cap_upg, btn_cloth_upg, btn_shorts_upg, btn_shoes_upg;
-    private ImageView btn_market;
+    private ImageView btn_market, btn_faq, btn_logout, btn_stats, btn_tasks;
     private ProgressBar progressBar;
     private GameView gameView;
     private ViewGroup.LayoutParams lp;
@@ -49,24 +50,31 @@ public class HomeActivity extends AppCompatActivity {
     Long shoesCapRate;
     long resumeTime;
     long pauseTime;
+    double gold = 0;
+    String[] goldFormat = {"k", "M", "B", "T", "aa", "bb", "cc", "dd", "ee",
+                        "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn",
+                        "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww",
+                        "xx", "yy", "zz", "AA", "BB", "CC", "DD", "EE", "FF",
+                        "GG", "HH", "II", "JJ", "KK", "LL", "MM", "NN", "OO",
+                        "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX",
+                        "YY", "ZZ"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        registerService();
         setContentView(R.layout.activity_home);
+
 
         userDB = new UserDAOSQLImpl(getApplicationContext());
         progressDB = new ProgressDAOSQLImpl(getApplicationContext());
         sp = getSharedPreferences("user", Context.MODE_PRIVATE);
 
-        //get data from the db
-        user = userDB.getUser(sp.getString("username", ""));
-        userProgress = progressDB.getOneProgress(user.getUsername());
-
         init();
 
         //set the data of the wintermelon
-        tv_name3.setText(user.getName());
+
         resumeTime = System.currentTimeMillis();
         pauseTime = System.currentTimeMillis();
 
@@ -89,8 +97,16 @@ public class HomeActivity extends AppCompatActivity {
         btn_shorts_upg = (ImageView) findViewById(R.id.btn_shorts_upg);
         btn_shoes_upg = (ImageView) findViewById(R.id.btn_shoes_upg);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        btn_logout = (ImageView) findViewById(R.id.btn_logout);
+        btn_stats = (ImageView) findViewById(R.id.btn_stats);
+        btn_faq = (ImageView) findViewById(R.id.btn_faq);
         btn_market = (ImageView) findViewById(R.id.btn_market);
+        btn_tasks = (ImageView) findViewById(R.id.btn_task);
 
+        Log.d("TANJIRO", "KAMADO");
+        user = userDB.getUser(sp.getString("username", ""));
+        userProgress = progressDB.getOneProgress(user.getUsername());
+        tv_name3.setText(user.getName());
         gameView = new GameView(this);
         cl = (ConstraintLayout) findViewById(R.id.cl);
         cl.addView(gameView, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
@@ -101,7 +117,6 @@ public class HomeActivity extends AppCompatActivity {
         shortExpRate = shortsExpFormula(userProgress.getShortlvl());
 
         cl.setOnClickListener(v -> {
-            Double currentGold = Double.parseDouble(tv_gold.getText().toString());
             Double capBonusGold = 5.0;
             if (userProgress.getCaplvl() > 0)
                 capBonusGold = capGoldRate;
@@ -115,11 +130,19 @@ public class HomeActivity extends AppCompatActivity {
                 progressBar.setProgress(user.getCurrentExp() + (int) capExpRate);
                 user.setCurrentExp(user.getCurrentExp() + (int) capExpRate);
             }
-            tv_gold.setText(Double.toString(currentGold + capBonusGold));
+            gold +=capBonusGold;
+            uiSetGold(gold);
         });
 
-        tv_gold.setText(String.format("%.2f",userProgress.getGold()));
+        //initialize gold
+        gold = userProgress.getGold();
+        uiSetGold(gold);
 
+        //initialize exp
+        progressBar.setMax((int) getProgressMax(user.getLevel()));
+        progressBar.setProgress(user.getCurrentExp());
+
+        //upgrade listeners
         btn_cap_upg.setOnClickListener(v -> {
             userProgress.setCaplvl(userProgress.getCaplvl()+1);
             capExpRate = capExpFormula(userProgress.getCaplvl());
@@ -146,6 +169,23 @@ public class HomeActivity extends AppCompatActivity {
             refreshData();
         });
 
+        btn_logout.setOnClickListener(v -> {
+            stopService();
+            Intent intent = new Intent(this, MainActivity.class);
+            Toast.makeText(this, "Logging Out! Please wait!", Toast.LENGTH_SHORT).show();
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.remove("username");
+                    editor.apply();
+                    startActivity(intent);
+                    finish();
+                }
+            }, 2000);
+        });
+
         btn_market.setOnClickListener(v -> {
             Intent intent = new Intent(this, MarketActivity.class);
             startActivity(intent);
@@ -154,15 +194,17 @@ public class HomeActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.mobdeve.cactus.mobdevemp");
         registerReceiver(broadcastReceiver, intentFilter);
-        registerService();
+
+
+        refreshData();
     }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (userProgress.getShortlvl() > 0) {
-                userProgress.setGold(userProgress.getGold() + shortGoldRate);
-                tv_gold.setText(String.format("%.2f", Double.parseDouble(tv_gold.getText().toString()) + shortGoldRate));
+                gold +=shortGoldRate;
+                uiSetGold(gold);
                 if (progressBar.getProgress() + (int) shortExpRate > progressBar.getMax()) {
                     user.setCurrentExp(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
                     progressBar.setProgress(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
@@ -190,40 +232,44 @@ public class HomeActivity extends AppCompatActivity {
         tv_cloth_shard.setText(userProgress.getShirtshard()+"/"+(5+userProgress.getShirtlvl()*5));
         tv_shorts_shard.setText(userProgress.getShortshard()+"/"+(5+userProgress.getShortlvl()*5));
 
-        if (userProgress.getCapshard() > (10+userProgress.getCaplvl()*5)) {
+        if (userProgress.getCapshard() > (5+userProgress.getCaplvl()*5)) {
             tv_cap_shard.setTextColor(Color.YELLOW);
             btn_cap_upg.setEnabled(true);
             saveData();
             refreshData();
         } else {
             tv_cap_shard.setTextColor(Color.WHITE);
+            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
 //            btn_cap_upg.setEnabled(false);
         }
-        if (userProgress.getShirtshard() > (10+userProgress.getShirtlvl()*5)) {
+        if (userProgress.getShirtshard() > (5+userProgress.getShirtlvl()*5)) {
             tv_cloth_shard.setTextColor(Color.YELLOW);
             btn_cloth_upg.setEnabled(true);
             saveData();
             refreshData();
         } else {
             tv_cloth_shard.setTextColor(Color.WHITE);
+            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
 //            btn_cloth_upg.setEnabled(false);
         }
-        if (userProgress.getShortshard() > (10+userProgress.getShortlvl()*5)) {
+        if (userProgress.getShortshard() > (5+userProgress.getShortlvl()*5)) {
             tv_shorts_shard.setTextColor(Color.YELLOW);
             btn_shorts_upg.setEnabled(true);
             saveData();
             refreshData();
         } else {
             tv_shorts_shard.setTextColor(Color.WHITE);
+            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
 //            btn_shorts_upg.setEnabled(false);
         }
-        if (userProgress.getShoeshard() > (10+userProgress.getShoelvl()*5)) {
+        if (userProgress.getShoeshard() > (5+userProgress.getShoelvl()*5)) {
             tv_shoes_shard.setTextColor(Color.YELLOW);
             btn_shoes_upg.setEnabled(true);
             saveData();
             refreshData();
         } else {
             tv_shoes_shard.setTextColor(Color.WHITE);
+            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
 //            btn_shoes_upg.setEnabled(false);
         }
     }
@@ -234,17 +280,13 @@ public class HomeActivity extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Double currentGold = Double.parseDouble(tv_gold.getText().toString());
                 if (userProgress.getShirtlvl() != 0) {
                     Double shirtBonusGold = shirtRate;
-                    tv_gold.setText(String.format("%.2f",currentGold + shirtBonusGold));
+                    gold +=shirtBonusGold;
+                    uiSetGold(gold);
                 }
             }
         }, 0, 1000);
-    }
-
-    public void cancelGoldTimer() {
-        timer.cancel();
     }
 
     public double capExpFormula(int level) {
@@ -298,6 +340,36 @@ public class HomeActivity extends AppCompatActivity {
         userDB.updateUser(user);
     }
 
+    public void uiSetGold(double gold) {
+        int ctr = -1;
+        double tempGold = gold;
+        while (tempGold>1000) {
+            ctr++;
+            tempGold/=1000;
+        }
+        if (ctr!=-1) tv_gold.setText(String.format("%.2f", tempGold) + goldFormat[ctr]);
+        else tv_gold.setText(String.format("%.2f", gold));
+
+    }
+
+    private void registerService() {
+        Intent serviceIntent = new Intent(this, SensorService.class);
+        stopService(serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else startService(serviceIntent);
+    }
+
+    private void stopService() {
+        Intent intent = new Intent();
+        intent.setAction("com.mobdeve.cactus.mobdevemp.destroyService");
+        sendBroadcast(intent);
+        Intent serviceIntent = new Intent(this, SensorService.class);
+        stopService(serviceIntent);
+        Log.d("TACSCA", "I AM NOW HERE");
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -306,11 +378,10 @@ public class HomeActivity extends AppCompatActivity {
         refreshGold();
         resumeTime = System.currentTimeMillis();
         if (resumeTime > pauseTime) {
-            Double currentGold = userProgress.getGold();
             long diffInSeconds = (resumeTime - pauseTime)/1000;
             if (userProgress.getShirtlvl()!=0) {
-                double value = currentGold + shirtFormula(userProgress.getShirtlvl()) * diffInSeconds;
-                tv_gold.setText(String.format("%.2f", value));
+                gold +=  shirtFormula(userProgress.getShirtlvl()) * diffInSeconds;
+                uiSetGold(gold);
             }
         }
     }
@@ -320,7 +391,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onPause();
         gameView.pause();
         timer.cancel();
-        userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
+        userProgress.setGold(gold);
         user.setLevel(user.getLevel());
         user.setCurrentExp(progressBar.getProgress());
         saveData();
@@ -329,7 +400,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        userProgress.setGold(Double.parseDouble(tv_gold.getText().toString()));
+        userProgress.setGold(gold);
         user.setLevel(user.getLevel());
         user.setCurrentExp(progressBar.getProgress());
         saveData();
@@ -339,13 +410,8 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra("rate", shortsGoldFormula(userProgress.getShortlvl()));
         intent.setAction("com.mobdeve.cactus.mobdevemp.service");
         sendBroadcast(intent);
+        unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 
-    private void registerService() {
-        Intent serviceIntent = new Intent(this, SensorService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else startService(serviceIntent);
-    }
 }
