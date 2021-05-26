@@ -37,11 +37,13 @@ public class MainActivity extends AppCompatActivity {
         btn_toLogin.setOnClickListener(view -> {
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(i);
+            finish();
         });
 
         btn_toRegister.setOnClickListener(view -> {
             Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
             startActivity(i);
+            finish();
         });
     }
 }

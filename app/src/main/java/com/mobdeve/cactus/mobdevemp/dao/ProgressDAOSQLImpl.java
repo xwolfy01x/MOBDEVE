@@ -92,7 +92,6 @@ public class ProgressDAOSQLImpl implements ProgressDAO, Serializable {
         values.put(ProgressDatabase.PROGRESS_SHOESHARD, oneProgress.getShoeshard());
 
         long entry = database.update(ProgressDatabase.TABLEPROGRESS, values, ProgressDatabase.PROGRESS_USER + " = ?", new String[] { oneProgress.getUsername() });
-        Log.d("UPDATE", "NAGUPDATE AKO GAGO");
         database.close();
     }
 }

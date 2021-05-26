@@ -1,6 +1,8 @@
 package com.mobdeve.cactus.mobdevemp.models;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String name = "";
     private String username = "";
     private String password = "";

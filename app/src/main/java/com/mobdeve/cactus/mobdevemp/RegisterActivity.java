@@ -63,6 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                 progressDB.initializeProgress(newProgress);
                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(intent);
+                finish();
             } else {
                 int found = 0;
                 for(int i = 0; i < userList.size();i++){
@@ -82,6 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
                     progressDB.initializeProgress(newProgress);
                     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivity(intent);
+                    finish();
                 } else Toast.makeText(getApplicationContext(), "Username already exists!", Toast.LENGTH_SHORT).show();
             }
         });

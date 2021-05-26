@@ -42,18 +42,19 @@ public class SensorService extends Service implements SensorEventListener {
     double gold;
     double rate;
     SharedPreferences sp;
+    SharedPreferences.Editor editor;
     ProgressDAOSQLImpl progressDatabase;
     private Progress userProgress;
     BroadcastReceiver broadcastReceiver;
     SensorEventTask se;
     Timer timer;
     private boolean isRunning = false;
+    private int walkCount;
 
     @Override
     public void onCreate() {
         super.onCreate();
         if (!isRunning) {
-            Log.d(".-.", "I HAVE BEEN REBORN");
             sp = getSharedPreferences("user", Context.MODE_PRIVATE);
             Intent notificationIntent = new Intent(this, HomeActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -95,7 +96,6 @@ public class SensorService extends Service implements SensorEventListener {
                         timer = new Timer();
                         gold = intent.getDoubleExtra("gold", 0);
                         rate = intent.getDoubleExtra("rate", 0);
-                        Log.d("WAWA", "I AM HERE NOPW");
                         progressDatabase = new ProgressDAOSQLImpl(getApplicationContext());
                         userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
                         if (userProgress.getShoelvl()!=0) {
@@ -135,7 +135,6 @@ public class SensorService extends Service implements SensorEventListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(timer!=null)
             timer.cancel();
-
         return START_STICKY;
     }
 
@@ -173,6 +172,7 @@ public class SensorService extends Service implements SensorEventListener {
                     intent.setAction("com.mobdeve.cactus.mobdevemp");
                     sendBroadcast(intent);
                     gold += rate;
+                    walkCount++;
                 }
             }
             return null;
@@ -181,14 +181,11 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-        Log.d("SA", "I WAS ACCIDENTALLY DESTROYED");
         isRunning = false;
         progressDatabase = new ProgressDAOSQLImpl(getApplicationContext());
         userProgress = progressDatabase.getOneProgress(sp.getString("username", ""));
         if(userProgress.getShoelvl()!=0) {
-            Log.d("ewan", String.format("%.2f",gold));
             userProgress.setGold(gold);
-            Log.d("goldNiUser", String.format("%.2f", userProgress.getGold()));
             progressDatabase.updateProgress(userProgress);
         }
         se.cancel(true);

@@ -206,7 +206,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
-                app:backgroundTint="#00ab66"
                 android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
 
@@ -253,7 +252,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
-                app:backgroundTint="#00ab66"
                 android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
         </LinearLayout>
@@ -300,10 +298,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
-                app:backgroundTint="#00ab66"
                 android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
-
         </LinearLayout>
 
         <LinearLayout
@@ -348,10 +344,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
-                app:backgroundTint="#00ab66"
                 android:src="@drawable/up_arrow"
                 android:background="@drawable/upgrade"/>
-
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

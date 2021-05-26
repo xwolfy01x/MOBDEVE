@@ -11,6 +11,7 @@ import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,6 +28,7 @@ import com.mobdeve.cactus.mobdevemp.dao.UserDAOSQLImpl;
 import com.mobdeve.cactus.mobdevemp.models.Progress;
 import com.mobdeve.cactus.mobdevemp.models.User;
 
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,6 +53,7 @@ public class HomeActivity extends AppCompatActivity {
     long resumeTime;
     long pauseTime;
     double gold = 0;
+    int walkCount, tapCount;
     String[] goldFormat = {"k", "M", "B", "T", "aa", "bb", "cc", "dd", "ee",
                         "ff", "gg", "hh", "ii", "jj", "kk", "ll", "mm", "nn",
                         "oo", "pp", "qq", "rr", "ss", "tt", "uu", "vv", "ww",
@@ -58,7 +61,6 @@ public class HomeActivity extends AppCompatActivity {
                         "GG", "HH", "II", "JJ", "KK", "LL", "MM", "NN", "OO",
                         "PP", "QQ", "RR", "SS", "TT", "UU", "VV", "WW", "XX",
                         "YY", "ZZ"};
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +75,26 @@ public class HomeActivity extends AppCompatActivity {
 
         init();
 
-        //set the data of the wintermelon
-
         resumeTime = System.currentTimeMillis();
         pauseTime = System.currentTimeMillis();
+
+        Calendar calendar = Calendar.getInstance();
+        SharedPreferences.Editor editor = sp.edit();
+        String lastLogin = calendar.get(Calendar.MONTH)+1 + "-" + calendar.get(Calendar.DAY_OF_MONTH) + "-" + calendar.get(Calendar.YEAR);
+        String ll = sp.getString(user.getUsername() + " LastLogin", "");
+        if (ll.equalsIgnoreCase(lastLogin)) {
+            Log.d("UPDATE", "I AM SAME");
+            walkCount = Integer.parseInt(sp.getString(user.getUsername() + " walkCount", "0"));
+            tapCount = Integer.parseInt(sp.getString(user.getUsername() + " tapCount", "0"));
+        } else {
+            Log.d("UPDATE", "I AM NEW/NOT THE SAME");
+            editor.putString(user.getUsername() + " LastLogin", lastLogin);
+            editor.putString(user.getUsername() + " walkCount", "0");
+            editor.putString(user.getUsername() + " tapCount", "0");
+            walkCount = 0;
+            tapCount = 0;
+            editor.apply();
+        }
 
     }
     public void init() {
@@ -103,7 +121,6 @@ public class HomeActivity extends AppCompatActivity {
         btn_market = (ImageView) findViewById(R.id.btn_market);
         btn_tasks = (ImageView) findViewById(R.id.btn_task);
 
-        Log.d("TANJIRO", "KAMADO");
         user = userDB.getUser(sp.getString("username", ""));
         userProgress = progressDB.getOneProgress(user.getUsername());
         tv_name3.setText(user.getName());
@@ -132,6 +149,7 @@ public class HomeActivity extends AppCompatActivity {
             }
             gold +=capBonusGold;
             uiSetGold(gold);
+            tapCount++;
         });
 
         //initialize gold
@@ -144,32 +162,41 @@ public class HomeActivity extends AppCompatActivity {
 
         //upgrade listeners
         btn_cap_upg.setOnClickListener(v -> {
+            userProgress.setCapshard(userProgress.getCapshard() - (5+userProgress.getCaplvl()*5));
             userProgress.setCaplvl(userProgress.getCaplvl()+1);
             capExpRate = capExpFormula(userProgress.getCaplvl());
             capGoldRate = capGoldFormula(userProgress.getCaplvl());
+            saveData();
             refreshData();
         });
 
         btn_cloth_upg.setOnClickListener(v -> {
+            userProgress.setShirtshard(userProgress.getShirtshard() - (5+userProgress.getShirtlvl()*5));
             userProgress.setShirtlvl(userProgress.getShirtlvl()+1);
             shirtRate = shirtFormula(userProgress.getShirtlvl());
+            saveData();
             refreshData();
         });
 
         btn_shorts_upg.setOnClickListener(v -> {
+            userProgress.setShortshard(userProgress.getShortshard() - (5+userProgress.getShortlvl()*5));
             userProgress.setShortlvl(userProgress.getShortlvl()+1);
             shortGoldRate = shortsGoldFormula(userProgress.getShortlvl());
             shortExpRate = shortsExpFormula(userProgress.getShortlvl());
+            saveData();
             refreshData();
         });
 
         btn_shoes_upg.setOnClickListener(v -> {
+            userProgress.setShoeshard(userProgress.getShoeshard() - (5+userProgress.getShoelvl()*5));
             userProgress.setShoelvl(userProgress.getShoelvl()+1);
             shoesCapRate = shoesCapFormula((userProgress.getShoelvl()));
+            saveData();
             refreshData();
         });
 
         btn_logout.setOnClickListener(v -> {
+            gameView.pause();
             stopService();
             Intent intent = new Intent(this, MainActivity.class);
             Toast.makeText(this, "Logging Out! Please wait!", Toast.LENGTH_SHORT).show();
@@ -187,14 +214,29 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         btn_market.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MarketActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MarketActivity.class);
+            intent.putExtra("gold", gold);
+            intent.putExtra("user", user);
+            intent.putExtra("userProgress", userProgress);
+            startActivity(intent);
+        });
+
+        btn_stats.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), StatisticsActivity.class);
+            intent.putExtra("user", user);
+            intent.putExtra("userProgress", userProgress);
+            startActivity(intent);
+        });
+
+        btn_tasks.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), QuestActivity.class);
             startActivity(intent);
         });
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.mobdeve.cactus.mobdevemp");
+        intentFilter.addAction("com.mobdeve.marketbuy");
         registerReceiver(broadcastReceiver, intentFilter);
-
 
         refreshData();
     }
@@ -202,19 +244,37 @@ public class HomeActivity extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (userProgress.getShortlvl() > 0) {
-                gold +=shortGoldRate;
-                uiSetGold(gold);
-                if (progressBar.getProgress() + (int) shortExpRate > progressBar.getMax()) {
-                    user.setCurrentExp(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
-                    progressBar.setProgress(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
-                    user.setLevel(user.getLevel()+1);
-                    progressBar.setMax((int) getProgressMax(user.getLevel()));
-                    refreshData();
-                } else {
-                    progressBar.setProgress(user.getCurrentExp() + (int) shortExpRate);
-                    user.setCurrentExp(user.getCurrentExp() + (int) shortExpRate);
+            if (intent.getAction().equalsIgnoreCase("com.mobdeve.cactus.mobdevemp")) {
+                if (userProgress.getShortlvl() > 0) {
+                    gold +=shortGoldRate;
+                    uiSetGold(gold);
+                    if (progressBar.getProgress() + (int) shortExpRate > progressBar.getMax()) {
+                        user.setCurrentExp(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
+                        progressBar.setProgress(progressBar.getProgress() + (int) shortExpRate - progressBar.getMax());
+                        user.setLevel(user.getLevel()+1);
+                        progressBar.setMax((int) getProgressMax(user.getLevel()));
+                        refreshData();
+                    } else {
+                        progressBar.setProgress(user.getCurrentExp() + (int) shortExpRate);
+                        user.setCurrentExp(user.getCurrentExp() + (int) shortExpRate);
+                    }
                 }
+                walkCount++;
+            }
+            else if (intent.getAction().equalsIgnoreCase("com.mobdeve.marketbuy")) {
+                Bundle bundle = intent.getExtras();
+                userProgress.setCapshard(userProgress.getCapshard() + bundle.getInt("capShard"));
+                userProgress.setShirtshard(userProgress.getShirtshard() + bundle.getInt("shirtShard"));
+                userProgress.setShortshard(userProgress.getShortshard() + bundle.getInt("shortShard"));
+                userProgress.setShoeshard(userProgress.getShoeshard() + bundle.getInt("shoeShard"));
+                userProgress.setCapshard(userProgress.getCapshard() + bundle.getInt("capShard2"));
+                userProgress.setShirtshard(userProgress.getShirtshard() + bundle.getInt("shirtShard2"));
+                userProgress.setShortshard(userProgress.getShortshard() + bundle.getInt("shortShard2"));
+                userProgress.setShoeshard(userProgress.getShoeshard() + bundle.getInt("shoeShard2"));
+                double value = (bundle.getInt("capShard") + bundle.getInt("shirtShard") + bundle.getInt("shortShard") + bundle.getInt("shoeShard"))*100;
+                gold -= value;
+                uiSetGold(gold);
+                refreshData();
             }
         }
     };
@@ -232,45 +292,41 @@ public class HomeActivity extends AppCompatActivity {
         tv_cloth_shard.setText(userProgress.getShirtshard()+"/"+(5+userProgress.getShirtlvl()*5));
         tv_shorts_shard.setText(userProgress.getShortshard()+"/"+(5+userProgress.getShortlvl()*5));
 
-        if (userProgress.getCapshard() > (5+userProgress.getCaplvl()*5)) {
+        if (userProgress.getCapshard() >= (5+userProgress.getCaplvl()*5)) {
             tv_cap_shard.setTextColor(Color.YELLOW);
+            btn_cap_upg.setBackgroundResource(getResources().getIdentifier("upgrade", "drawable", getPackageName()));
             btn_cap_upg.setEnabled(true);
-            saveData();
-            refreshData();
         } else {
             tv_cap_shard.setTextColor(Color.WHITE);
-            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
-//            btn_cap_upg.setEnabled(false);
+            btn_cap_upg.setBackgroundResource(getResources().getIdentifier("upgrade2", "drawable", getPackageName()));
+            btn_cap_upg.setEnabled(false);
         }
-        if (userProgress.getShirtshard() > (5+userProgress.getShirtlvl()*5)) {
+        if (userProgress.getShirtshard() >= (5+userProgress.getShirtlvl()*5)) {
             tv_cloth_shard.setTextColor(Color.YELLOW);
+            btn_cloth_upg.setBackgroundResource(getResources().getIdentifier("upgrade", "drawable", getPackageName()));
             btn_cloth_upg.setEnabled(true);
-            saveData();
-            refreshData();
         } else {
             tv_cloth_shard.setTextColor(Color.WHITE);
-            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
-//            btn_cloth_upg.setEnabled(false);
+            btn_cloth_upg.setBackgroundResource(getResources().getIdentifier("upgrade2", "drawable", getPackageName()));
+            btn_cloth_upg.setEnabled(false);
         }
-        if (userProgress.getShortshard() > (5+userProgress.getShortlvl()*5)) {
+        if (userProgress.getShortshard() >= (5+userProgress.getShortlvl()*5)) {
             tv_shorts_shard.setTextColor(Color.YELLOW);
+            btn_shorts_upg.setBackgroundResource(getResources().getIdentifier("upgrade", "drawable", getPackageName()));
             btn_shorts_upg.setEnabled(true);
-            saveData();
-            refreshData();
         } else {
             tv_shorts_shard.setTextColor(Color.WHITE);
-            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
-//            btn_shorts_upg.setEnabled(false);
+            btn_shorts_upg.setBackgroundResource(getResources().getIdentifier("upgrade2", "drawable", getPackageName()));
+            btn_shorts_upg.setEnabled(false);
         }
-        if (userProgress.getShoeshard() > (5+userProgress.getShoelvl()*5)) {
+        if (userProgress.getShoeshard() >= (5+userProgress.getShoelvl()*5)) {
             tv_shoes_shard.setTextColor(Color.YELLOW);
+            btn_shoes_upg.setBackgroundResource(getResources().getIdentifier("upgrade", "drawable", getPackageName()));
             btn_shoes_upg.setEnabled(true);
-            saveData();
-            refreshData();
         } else {
             tv_shoes_shard.setTextColor(Color.WHITE);
-            btn_cap_upg.setBackgroundResource(R.drawable.upgrade2);
-//            btn_shoes_upg.setEnabled(false);
+            btn_shoes_upg.setBackgroundResource(getResources().getIdentifier("upgrade2", "drawable", getPackageName()));
+            btn_shoes_upg.setEnabled(false);
         }
     }
 
@@ -349,7 +405,6 @@ public class HomeActivity extends AppCompatActivity {
         }
         if (ctr!=-1) tv_gold.setText(String.format("%.2f", tempGold) + goldFormat[ctr]);
         else tv_gold.setText(String.format("%.2f", gold));
-
     }
 
     private void registerService() {
@@ -366,13 +421,22 @@ public class HomeActivity extends AppCompatActivity {
         sendBroadcast(intent);
         Intent serviceIntent = new Intent(this, SensorService.class);
         stopService(serviceIntent);
-        Log.d("TACSCA", "I AM NOW HERE");
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        gameView.setVisibility(View.VISIBLE);
         gameView.resume();
         refreshData();
         refreshGold();
@@ -399,6 +463,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
         userProgress.setGold(gold);
         user.setLevel(user.getLevel());
@@ -411,7 +480,10 @@ public class HomeActivity extends AppCompatActivity {
         intent.setAction("com.mobdeve.cactus.mobdevemp.service");
         sendBroadcast(intent);
         unregisterReceiver(broadcastReceiver);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(user.getUsername() + " tapCount", Integer.toString(tapCount));
+        editor.putString(user.getUsername() + " walkCount", Integer.toString(walkCount));
+        editor.apply();
         super.onDestroy();
     }
-
 }

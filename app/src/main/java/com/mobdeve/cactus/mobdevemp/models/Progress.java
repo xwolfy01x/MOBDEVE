@@ -19,17 +19,9 @@ public class Progress implements Serializable {
     private int shortshard;
     private int shoeshard;
 
-    //gold value given by cap + shirt
-    private double capVal;
-    private double shirtVal;
-    //lvl or distance value given by shorts + shoe
-    private double shortVal;
-    private double shoeVal;
-
-
     public Progress(String username) {
         this.username = username;
-        this.gold = 0.0;
+        this.gold = 500.0;
         this.caplvl = 1;
         this.shirtlvl = 0;
         this.shortlvl = 0;
