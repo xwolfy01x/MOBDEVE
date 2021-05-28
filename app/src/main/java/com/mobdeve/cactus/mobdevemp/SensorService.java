@@ -106,6 +106,7 @@ public class SensorService extends Service implements SensorEventListener {
                                     nm.cancel(5);
                                     isRunning = false;
                                     stopForeground(true);
+                                    scheduleNotification(context.getApplicationContext(), 1000, 1);
                                     stopSelf();
                                 }
                             }, userProgress.getShoelvl() * 60000);

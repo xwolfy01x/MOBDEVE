@@ -33,6 +33,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class HomeActivity extends AppCompatActivity {
+    private String[] randSteps = {"100", "200", "500"};
+    private String[] randTaps = {"1000", "500", "2000"};
+    private int stepVal, tapVal;
     private TextView tv_gold, tv_name3, tv_level;
     private TextView tv_cap_lvl, tv_cloth_lvl, tv_shorts_lvl, tv_shoes_lvl;
     private TextView tv_cap_shard, tv_cloth_shard, tv_shorts_shard, tv_shoes_shard;
@@ -68,7 +71,6 @@ public class HomeActivity extends AppCompatActivity {
         registerService();
         setContentView(R.layout.activity_home);
 
-
         userDB = new UserDAOSQLImpl(getApplicationContext());
         progressDB = new ProgressDAOSQLImpl(getApplicationContext());
         sp = getSharedPreferences("user", Context.MODE_PRIVATE);
@@ -93,6 +95,10 @@ public class HomeActivity extends AppCompatActivity {
             editor.putString(user.getUsername() + " tapCount", "0");
             walkCount = 0;
             tapCount = 0;
+            tapVal = Integer.parseInt(randTaps[randomVal()]);
+            editor.putString(user.getUsername() + " tapVal", String.valueOf(tapVal));
+            editor.putString(user.getUsername() + " stepVal", String.valueOf(stepVal));
+            stepVal = Integer.parseInt(randSteps[randomVal()]);
             editor.putString(user.getUsername() + " quest1", "false");
             editor.putString(user.getUsername() + " quest2", "false");
             editor.putString(user.getUsername() + " quest3", "false");
@@ -430,6 +436,13 @@ public class HomeActivity extends AppCompatActivity {
         else tv_gold.setText(String.format("%.2f", gold));
     }
 
+    public int randomVal(){
+        int min, max;
+        min = 0;
+        max = randSteps.length - 1;
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
     private void registerService() {
         Intent serviceIntent = new Intent(this, SensorService.class);
         stopService(serviceIntent);
@@ -461,6 +474,24 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         gameView.setVisibility(View.VISIBLE);
         gameView.resume();
+        SharedPreferences.Editor editor = sp.edit();
+        userProgress.setCapshard(userProgress.getCapshard() + Integer.parseInt(sp.getString(user.getUsername() + " capShard", "0")));
+        userProgress.setShirtshard(userProgress.getShirtshard() + Integer.parseInt(sp.getString(user.getUsername() + " shirtShard", "0")));
+        userProgress.setShortshard(userProgress.getShortshard() + Integer.parseInt(sp.getString(user.getUsername() + " shortShard", "0")));
+        userProgress.setShoeshard(userProgress.getShoeshard() + Integer.parseInt(sp.getString(user.getUsername() + " shoeShard", "0")));
+        userProgress.setCapshard(userProgress.getCapshard() + Integer.parseInt(sp.getString(user.getUsername() + " capShard2", "0")));
+        userProgress.setShirtshard(userProgress.getShirtshard() + Integer.parseInt(sp.getString(user.getUsername() + " shirtShard2", "0")));
+        userProgress.setShortshard(userProgress.getShortshard() + Integer.parseInt(sp.getString(user.getUsername() + " shortShard2", "0")));
+        userProgress.setShoeshard(userProgress.getShoeshard() + Integer.parseInt(sp.getString(user.getUsername() + " shoeShard2", "0")));
+        editor.remove(user.getUsername() + " capShard");
+        editor.remove(user.getUsername() + " shirtShard");
+        editor.remove(user.getUsername() + " shortShard");
+        editor.remove(user.getUsername() + " shoeShard");
+        editor.remove(user.getUsername() + " capShard2");
+        editor.remove(user.getUsername() + " shirtShard2");
+        editor.remove(user.getUsername() + " shortShard2");
+        editor.remove(user.getUsername() + " shoeShard2");
+        editor.apply();
         refreshData();
         refreshGold();
         resumeTime = System.currentTimeMillis();

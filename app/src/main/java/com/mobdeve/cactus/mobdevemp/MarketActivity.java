@@ -345,17 +345,17 @@ public class MarketActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Intent intent = new Intent();
-        intent.setAction("com.mobdeve.marketbuy");
-        intent.putExtra("capShard", capShard);
-        intent.putExtra("shirtShard", shirtShard);
-        intent.putExtra("shortShard", shortShard);
-        intent.putExtra("shoeShard", shoeShard);
-        intent.putExtra("capShard2", capShard2);
-        intent.putExtra("shirtShard2", shirtShard2);
-        intent.putExtra("shortShard2", shortShard2);
-        intent.putExtra("shoeShard2", shoeShard2);
-        sendBroadcast(intent);
+        SharedPreferences sp = getSharedPreferences("user", Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = sp.edit();
+        ed.putString(user.getUsername() + " capShard", Integer.toString(capShard));
+        ed.putString(user.getUsername() + " shirtShard", Integer.toString(shirtShard));
+        ed.putString(user.getUsername() + " shortShard", Integer.toString(shortShard));
+        ed.putString(user.getUsername() + " shoeShard", Integer.toString(shoeShard));
+        ed.putString(user.getUsername() + " capShard2", Integer.toString(capShard2));
+        ed.putString(user.getUsername() + " shirtShard2", Integer.toString(shirtShard2));
+        ed.putString(user.getUsername() + " shortShard2", Integer.toString(shortShard2));
+        ed.putString(user.getUsername() + " shoeShard2", Integer.toString(shoeShard2));
+        ed.apply();
         super.onDestroy();
     }
 }

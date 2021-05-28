@@ -14,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.mobdeve.cactus.mobdevemp.models.Progress;
 import com.mobdeve.cactus.mobdevemp.models.User;
 
-import java.util.Calendar;
-
 public class QuestActivity extends AppCompatActivity {
     private String[] lootBoxRewards = {
             "10-Cap Shards",
@@ -31,6 +29,9 @@ public class QuestActivity extends AppCompatActivity {
             "50-Short Shards",
             "50-Shoe Shards",
     };
+    private String[] randSteps = {"100", "200", "500"};
+    private String[] randTaps = {"1000", "500", "2000"};
+    private int stepVal, tapVal;
     private TextView tv_taskquota2, tv_taskquota3;
     private TextView tv_task2, tv_task3;
     private ImageView iv_quest1, iv_quest2, iv_quest3;
@@ -75,6 +76,10 @@ public class QuestActivity extends AppCompatActivity {
         shirtShard2 = 0;
         shortShard2 = 0;
         shoeShard2 = 0;
+        tapVal = Integer.parseInt(sp.getString(user.getUsername() + " tapVal", "0"));
+        stepVal = Integer.parseInt(sp.getString(user.getUsername() + " stepVal", "0"));
+        tapVal = Integer.parseInt(randTaps[randomStepVal()]);
+        stepVal = Integer.parseInt(randSteps[randomStepVal()]);
         quest1_collected = sp.getString(user.getUsername() + " quest1", "false");
         quest2_collected = sp.getString(user.getUsername() + " quest2", "false");
         quest3_collected = sp.getString(user.getUsername() + " quest3", "false");
@@ -90,6 +95,7 @@ public class QuestActivity extends AppCompatActivity {
                 complete1.setVisibility(View.GONE);
                 completed1.setVisibility(View.VISIBLE);
                 iv_quest1.setEnabled(false);
+                iv_quest1.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
                 quest1_collected = "true";
                 Toast.makeText(this, "Quest Completed! Received a lootbox!", Toast.LENGTH_SHORT).show();
                 ed.putString(user.getUsername() + " quest1", "true");
@@ -103,8 +109,9 @@ public class QuestActivity extends AppCompatActivity {
             }else {
                 claimLootBox();
                 complete2.setVisibility(View.GONE);
-                complete2.setVisibility(View.VISIBLE);
+                completed2.setVisibility(View.VISIBLE);
                 iv_quest2.setEnabled(false);
+                iv_quest2.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
                 quest2_collected = "true";
                 Toast.makeText(this, "Quest Completed! Received a lootbox!", Toast.LENGTH_SHORT).show();
                 ed.putString(user.getUsername() + " quest2", "true");
@@ -118,8 +125,9 @@ public class QuestActivity extends AppCompatActivity {
             }else {
                 claimLootBox();
                 complete3.setVisibility(View.GONE);
-                complete3.setVisibility(View.VISIBLE);
+                completed3.setVisibility(View.VISIBLE);
                 iv_quest3.setEnabled(false);
+                iv_quest3.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
                 quest3_collected = "true";
                 Toast.makeText(this, "Quest Completed! Received a lootbox!", Toast.LENGTH_SHORT).show();
                 ed.putString(user.getUsername() + " quest3", "true");
@@ -149,7 +157,7 @@ public class QuestActivity extends AppCompatActivity {
         int tempTap = Integer.parseInt(taps);
         int tempWalk = Integer.parseInt(step);
 
-        if(tempTap >= 1000 && quest2_collected.equalsIgnoreCase("true")){
+        if(tempTap >= tapVal && quest2_collected.equalsIgnoreCase("false")){
             iv_quest2.setEnabled(true);
             complete2.setVisibility(View.VISIBLE);
         } else {
@@ -157,16 +165,16 @@ public class QuestActivity extends AppCompatActivity {
             complete2.setVisibility(View.GONE);
         }
 
-        if(tempWalk >= 100 && quest3_collected.equalsIgnoreCase("true")){
+        if(tempWalk >= stepVal && quest3_collected.equalsIgnoreCase("false")){
             iv_quest3.setEnabled(true);
             complete3.setVisibility(View.VISIBLE);
-        } else {
+        } else{
             iv_quest3.setEnabled(false);
             complete3.setVisibility(View.GONE);
         }
 
-        tv_taskquota2.setText(tempTap + "/1000");
-        tv_taskquota3.setText(tempWalk+"/100");
+        tv_taskquota2.setText(tempTap + "/" + tapVal);
+        tv_taskquota3.setText(tempWalk+"/" + stepVal);
     }
 
     public void checkCompleted(){
@@ -178,14 +186,17 @@ public class QuestActivity extends AppCompatActivity {
         if(check1.equalsIgnoreCase("true")){
             complete1.setVisibility(View.GONE);
             completed1.setVisibility(View.VISIBLE);
+            iv_quest1.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
         }
         if(check2.equalsIgnoreCase("true")){
             complete2.setVisibility(View.GONE);
             completed2.setVisibility(View.VISIBLE);
+            iv_quest2.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
         }
         if(check3.equalsIgnoreCase("true")){
             complete3.setVisibility(View.GONE);
             completed3.setVisibility(View.VISIBLE);
+            iv_quest3.setBackgroundResource(getResources().getIdentifier("quest_rectangle2", "drawable", getPackageName()));
         }
     }
 
@@ -205,7 +216,6 @@ public class QuestActivity extends AppCompatActivity {
     }
 
     public void checkResetTime(){ ;
-        //if time in shared preferences has passed 00:00, reset everything
         iv_quest2.setEnabled(false);
         iv_quest3.setEnabled(false);
         complete1.setVisibility(View.VISIBLE);
@@ -214,6 +224,21 @@ public class QuestActivity extends AppCompatActivity {
         completed2.setVisibility(View.GONE);
         complete3.setVisibility(View.VISIBLE);
         completed3.setVisibility(View.GONE);
+    }
+    public int randomStepVal(){
+        int min, max;
+        min = 0;
+        max = randSteps.length - 1;
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+    @Override
+    protected void onDestroy() {
+        ed.putString(user.getUsername() + " capShard2", Integer.toString(capShard2));
+        ed.putString(user.getUsername() + " shirtShard2", Integer.toString(shirtShard2));
+        ed.putString(user.getUsername() + " shortShard2", Integer.toString(shortShard2));
+        ed.putString(user.getUsername() + " shoeShard2", Integer.toString(shoeShard2));
+        ed.apply();
+        super.onDestroy();
     }
 }
 

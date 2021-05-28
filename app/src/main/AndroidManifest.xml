@@ -13,13 +13,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MOBDEVEMP">
         <activity android:name=".StatisticsActivity"></activity>
-        <activity android:name=".MarketActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".HelpActivity" />
-        <activity android:name=".QuestActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MarketActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HomeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HelpActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".QuestActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
