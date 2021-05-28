@@ -93,6 +93,9 @@ public class HomeActivity extends AppCompatActivity {
             editor.putString(user.getUsername() + " tapCount", "0");
             walkCount = 0;
             tapCount = 0;
+            editor.putString(user.getUsername() + " quest1", "false");
+            editor.putString(user.getUsername() + " quest2", "false");
+            editor.putString(user.getUsername() + " quest3", "false");
             editor.apply();
         }
 
@@ -230,12 +233,24 @@ public class HomeActivity extends AppCompatActivity {
 
         btn_tasks.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), QuestActivity.class);
+            intent.putExtra("user", user);
+            intent.putExtra("userProgress", userProgress);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(user.getUsername() + " tapCount", Integer.toString(tapCount));
+            editor.putString(user.getUsername() + " walkCount", Integer.toString(walkCount));
+            editor.apply();
+            startActivity(intent);
+        });
+
+        btn_faq.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), HelpActivity.class);
             startActivity(intent);
         });
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.mobdeve.cactus.mobdevemp");
         intentFilter.addAction("com.mobdeve.marketbuy");
+        intentFilter.addAction("com.mobdeve.quest");
         registerReceiver(broadcastReceiver, intentFilter);
 
         refreshData();
@@ -274,6 +289,14 @@ public class HomeActivity extends AppCompatActivity {
                 double value = (bundle.getInt("capShard") + bundle.getInt("shirtShard") + bundle.getInt("shortShard") + bundle.getInt("shoeShard"))*100;
                 gold -= value;
                 uiSetGold(gold);
+                refreshData();
+            }
+            else if(intent.getAction().equalsIgnoreCase("com.mobdeve.quest")){
+                Bundle bundle = intent.getExtras();
+                userProgress.setCapshard(userProgress.getCapshard() + bundle.getInt("capShard2"));
+                userProgress.setShirtshard(userProgress.getShirtshard() + bundle.getInt("shirtShard2"));
+                userProgress.setShortshard(userProgress.getShortshard() + bundle.getInt("shortShard2"));
+                userProgress.setShoeshard(userProgress.getShoeshard() + bundle.getInt("shoeShard2"));
                 refreshData();
             }
         }
